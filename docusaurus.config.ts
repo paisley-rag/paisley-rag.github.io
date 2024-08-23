@@ -68,8 +68,8 @@ const config: Config = {
       title: "Paisley",
       logo: {
         alt: "Paisley Logo",
-        src: "img/logo-light.png",
-        srcDark: 'img/logo-dark.png',
+        src: "img/logo-sq-purple.png",
+        srcDark: 'img/logo-sq-white.png',
       },
       items: [
         { to: "/case-study", label: "Case Study", position: "right" },
@@ -97,8 +97,8 @@ const config: Config = {
       style: "light",
       logo: {
         alt: "Paisley Logo",
-        src: "img/logo-light.png",
-        srcDark: 'img/logo-dark.png',
+        src: "img/logo-sq-purple.png",
+        srcDark: 'img/logo-sq-white.png',
         width: 200,
         href: "/",
       },

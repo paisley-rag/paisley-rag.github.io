@@ -15,7 +15,7 @@
 :root {
   /* --ifm-color-primary: #7771fe; */
   /* --ifm-color-primary: #564dfe; */
-  --ifm-color-primary: #62D4F9;
+  --ifm-color-primary: #2163df;
   --ifm-color-primary-dark: #E16BFC;
   --ifm-color-primary-darker: #9919F6;
   --ifm-color-primary-darkest: #190D5B;
@@ -25,6 +25,7 @@
   --ifm-code-font-size: 95%;
   /* --ifm-font-family-base: "Rubik"; */
   --ifm-font-family-base: "Arial";
+  --ifm-navbar-link-hover-color: #2163Df;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 

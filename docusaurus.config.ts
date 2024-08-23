@@ -68,7 +68,8 @@ const config: Config = {
       title: "Paisley",
       logo: {
         alt: "Paisley Logo",
-        src: "img/logo.png",
+        src: "img/logo-light.png",
+        srcDark: 'img/logo-dark.png',
       },
       items: [
         { to: "/case-study", label: "Case Study", position: "right" },
@@ -77,13 +78,13 @@ const config: Config = {
         //   sidebarId: "tutorialSidebar",
         //   position: "right",
         //   label: "Docs",
-        //   to: "/docs/using-cerebellum",
-        // },
+        //   to: "/docs/using-paisley",
+        // }
         {
           to: "/team",
           label: "Team",
           position: "right",
-          activeBasePath: "never-active",
+          // activeBasePath: "never-active",
         },
         {
           href: "https://github.com/paisley-rag/db",
@@ -96,13 +97,14 @@ const config: Config = {
       style: "light",
       logo: {
         alt: "Paisley Logo",
-        src: "img/logo.png",
-        width: 100,
+        src: "img/logo-light.png",
+        srcDark: 'img/logo-dark.png',
+        width: 200,
         href: "/",
       },
       links: [
         {
-          title: "Navigation",
+          title: "Links",
           items: [
             {
               label: "Case Study",
@@ -114,7 +116,7 @@ const config: Config = {
             },
             // {
             //   label: "Docs",
-            //   to: "/docs/using-cerebellum",
+            //   to: "/docs/using-paisley",
             // },
             {
               label: "Github",

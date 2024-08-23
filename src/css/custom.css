@@ -23,9 +23,8 @@
   --ifm-color-primary-lighter: #248AE3;
   --ifm-color-primary-lightest: #35A6E7;
   --ifm-code-font-size: 95%;
-  /* --ifm-font-family-base: "Rubik"; */
   --ifm-font-family-base: "Arial";
-  --ifm-navbar-link-hover-color: #2163Df;
+  --ifm-navbar-link-hover-color: var(--ifm-color-primary);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 

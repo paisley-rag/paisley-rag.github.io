@@ -30,10 +30,10 @@
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
-  --ifm-color-primary: #10c7fe;
-  --ifm-color-primary-dark: #0d9fcb;
-  --ifm-color-primary-darker: #0a7798;
-  --ifm-color-primary-darkest: #065066;
+  --ifm-color-primary: #2163df;
+  --ifm-color-primary-dark: #35a6e7;
+  --ifm-color-primary-darker: #248ae3;
+  --ifm-color-primary-darkest: #2163df;
   --ifm-color-primary-light: #40d2fe;
   --ifm-color-primary-lighter: #70ddfe;
   --ifm-color-primary-lightest: #9fe9ff;
@@ -43,6 +43,14 @@
 h1, h2, h3, h4, h5, h6 {
   font-family: 'rubik';
   font-weight: 600;
+}
+
+[data-theme="light"] main{
+  background-color: white;
+}
+
+.sidebar .table-of-contents > li {
+  margin-bottom: 25px;
 }
 
 .selected {
@@ -136,8 +144,7 @@ a[class*="footerLogoLink"]:hover {
 
 @media (min-width: 997px) {
   .sidebar {
-    flex: 0 1 325px;
-    padding: 16px;
+    flex: 0 1 240px;
   }
 
   .col--8 {
@@ -162,8 +169,11 @@ a[class*="footerLogoLink"]:hover {
   }
 
   .sidebar {
-    flex: 0 1 350px;
-    padding: 16px;
+    flex: 0 1 250px;
+  }
+
+  article {
+    max-width: 700px;
   }
 }
 
@@ -179,15 +189,16 @@ div.col--8 article h1 {
 }
 
 div.col--8 article h2 {
-  letter-spacing: -1px;
+  /* letter-spacing: -1px; */
   font-size: 32px;
   margin-bottom: 8px;
   margin-top: 24px;
+  color: var(--ifm-color-primary-darkest);
 }
 
 div.col--8 article h3 {
   font-size: 24px;
-  letter-spacing: -0.5px;
+  /* letter-spacing: -0.5px; */
   margin-bottom: 8px;
   margin-top: 24px;
   line-height: 2.2rem;

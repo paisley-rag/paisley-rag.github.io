@@ -128,20 +128,20 @@ When a user submits a query (“1” in diagram below), it is embedded using the
 <img src='/img/2-2-2-kb-query.png' alt='querying' />
 
 #### 2.2.3 Summary of retrieval
-In the diagram below, we summarize the steps involved in retrieval from a knowledge base:
+In the diagram below, we summarize the steps involved in retrieval from and discuss the addition of multiple knowledge bases:
 <ol>
-  <li>User submits a query,</li>
-  <li>Query is embedded via the same embedding model used for ingestion,</li>
-  <li>Query embedding is used for vector similarity search against the embeddings in the vector DB,</li>
-  <li>Relevant text chunks are returned from vector similarity search, and</li>
-  <li>Combined instructions, context (of relevant text chunks), and user query is sent to the LLM as a prompt to generate a response.</li>
+  <li>User submits a query.</li>
+  <li>Query is embedded via the same embedding model used for ingestion. If different knowledge bases use different embedding models, the query will be embedded multiple times, once for each knowledge base.</li>
+  <li>(The appropriate) query embedding is used for vector similarity search against the embeddings in each vector DB.</li>
+  <li>Relevant text chunks are returned from vector similarity search of each knowledge base and combined, and</li>
+  <li>Instructions, combined context (all relevant text chunks), and user query is sent to the LLM as a prompt to generate a response.</li>
 </ol>
 
-<img src='/img/2-2-2-kb-query2.png' alt='retrieval with knowledge base' />
+<img src='/img/2-2-2-kb-query2-alt.png' alt='retrieval with knowledge base' />
 
 ### 2.3 Post-processing context
 
-Above, we’ve outlined a simple RAG process involving indexing and retrieval prior to a response from the LLM. If additional knowledge bases are added, each representing different choices in how documents are ingested to best suit content type, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context can significantly improve RAG performance[^2].
+Above, we’ve outlined a relatively simple RAG process involving indexing and retrieval prior to a response from the LLM. If additional knowledge bases are added, each representing different choices in how documents are ingested to best suit content type, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context can significantly improve RAG performance[^2].
 
 To manage the volume of retrieved context, some filtering of context before submission to the LLM improves RAG performance.  Once context is retrieved, rejecting the context that may be least relevant (i.e., the corresponding vector is least similar to the query) helps to reduce computational resources and/or LLM token costs. This process is known as *similarity filtering*.
 

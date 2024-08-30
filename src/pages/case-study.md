@@ -117,9 +117,9 @@ In the final step of ingestion each chunk’s embedding is then stored in a vect
 
 <img src='/img/2-2-1-kb-embed3.png' alt='embedding3' />
 
-The completed picture of how a knowledge base supports retrieval in a RAG system is shown below.
+A summary representation of the ingestion process in a knowledge base is shown below.
 
-<img src='/img/2-2-1-kb-embed-last.png' alt='a knowledgebase supports retrieval' />
+<img src='/img/2-2-1-kb-embed-last1.png' alt='a knowledgebase supports retrieval' />
 
 
 #### 2.2.2 Processing a query
@@ -127,6 +127,17 @@ When a user submits a query (“1” in diagram below), it is embedded using the
 
 <img src='/img/2-2-2-kb-query.png' alt='querying' />
 
+#### 2.2.3 Summary of retrieval
+In the diagram below, we summarize the steps involved in retrieval from a knowledge base:
+<ol>
+  <li>User submits a query,</li>
+  <li>Query is embedded via the same embedding model used for ingestion,</li>
+  <li>Query embedding is used for vector similarity search against the embeddings in the vector DB,</li>
+  <li>Relevant text chunks are returned from vector similarity search, and</li>
+  <li>Combined instructions, context (of relevant text chunks), and user query is sent to the LLM as a prompt to generate a response.</li>
+</ol>
+
+<img src='/img/2-2-2-kb-query2.png' alt='retrieval with knowledge base' />
 
 ### 2.3 Post-processing context
 

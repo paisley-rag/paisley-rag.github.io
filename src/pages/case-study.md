@@ -299,7 +299,7 @@ To use Paisley, you must have an AWS account. In preparation, you should log int
 
 Once these preliminary steps are complete you can download the Paisley application to your laptop. We document a series of steps and provide AWS CDK (Cloud Development Kit) scripts to streamline deploying (and tearing down) Paisley infrastructure. If desired, multiple concurrent instances of Paisley can be deployed onto their own distinct infrastructure using the same scripts.
 
-The UI discussed above is automatically available once the server is deployed by navigating to the assigned IP address with a web browser. This UI interacts with an API back-end which is also automatically deployed. If desired, developers can access the created API endpoints directly.
+The UI discussed above is automatically available once the server is deployed by navigating to the assigned IP address with a web browser. This UI interacts with an API back-end which is also automatically deployed.
 
 ## 5. Paisley design
 
@@ -307,14 +307,25 @@ As mentioned in Sections 1 and 3, our primary goal was to create a RAG chatbot �
 
 In support of this objective, we picked AWS as a cloud infrastructure provider because it is commonly used and has all of the major building blocks we need to stand-up a chatbot used by ~20 people.
 
+### 5.1 Web architecture
 
-### 5.1 EC2 server
+Since Paisley is deployed on AWS cloud infrastructure we adopt a number of web application conventions to make our UI accessible and secure. On an EC2 server a web server (Nginx) serves our UI, which interacts with the Paisley application server, which connects to our back end databases, as described in the rest of Section 5 below.
+
+Given the latency inherent in external API calls to embedding models and LLMs, we opted to implement our UI as a single page application using optimistic UI updates where sensible. The Paisley UI is built in React-Typescript using Tailwind CSS (https://tailwindcss.com/) and shadcn/ui components (https://ui.shadcn.com/).
+
+To make the application server accessible for users, the deployed EC2 instance has a publicly accessible IP address. To secure the IP address and the associated API routes Paisley uses JWT authentication.
+
+In alignment with general web design conventions, we implemented resource-oriented REST APIs through FastAPI as part of our application server. Our primary API resource names are knowledge-bases and chatbots.
+
+With the architecture described above we conducted load testing on UI interactions which did *not* require external API calls (e.g., to models or LLMs) and we were able to support up to ~15,000 concurrent users. Although this figure is not a realistic representation of our core use case as a RAG chatbot, it is an indication that the underlying web architecture is sufficiently robust for our intended use case. We discuss load testing on the core chatbot query route in Section 6.1 below.
+
+### 5.2 EC2 server
 
 The core of Paisley revolves around a back-end server that provides API endpoints for our web-based UI and chatbot users. Our server also calls external APIs for embedding models and LLMs. To host this server we chose a (cost-effective) AWS EC2 instance. This long-running server gives us the flexibility to define a larger Elastic Block Storage size to maintain all of the necessary development libraries and dependencies. A single EC2 instance also provides us the option of converting to auto-scaling instances in future, if required.
 
 <img src='/img/5-1-0-infra.png' alt='basic infrastructure overview' />
 
-#### 5.1.1 EC2 vs Lambda
+#### 5.2.1 EC2 vs Lambda
 
 An EC2 server also ended up being ideal for potentially long-running processes such as ingestion and evaluations data processing - both of which use external APIs to access  embedding models. At first glance, there is potential for activity levels in these areas to fluctuate greatly and be “bursty” (e.g., a user may initially upload many files to create a knowledge base and then not ingest files at all once the chatbot is in use). As a result, we explored the use of AWS Lambdas (serverless functions). 
 
@@ -322,17 +333,17 @@ However, from initial testing we realized that the 15 min runtime limit of Lambd
 
 Ultimately, we decided the additional complexity to work around Lambda runtime limitations was not required given our need for a long-running server instance to host our application server and UI.
 
-### 5.2 Databases
+### 5.3 Databases
 
 From among the many AWS database offerings, we selected S3, DocumentDB (“DocDB”) and RDS. All of these are stable, long-term AWS database offerings that are used in many production applications. 
 
 <img src='/img/5-2-0-infra1.png' alt='basic infrastructure with dbs' />
 
-#### 5.2.1 File uploads
+#### 5.3.1 File uploads
 
 AWS S3 is cost-effective long-term storage for documents uploaded to knowledge bases by users. Once ingested, these documents do not need to be accessed, and S3 provides many options for users to optimize cost for long-term storage.
 
-#### 5.2.2 Knowledge base and chatbot
+#### 5.3.2 Knowledge base and chatbot
 Knowledge bases are composed of text chunks, the corresponding vector embeddings, and associated metadata identifying the original document. Each knowledge base also has a json configuration object which defines the documents within the knowledge base and how they were ingested. Different embedding models may store and retrieve data with slightly different data structures.
 
 Chatbots have a similar json configuration object which defines included knowledge bases, post-processing, and LLM options for each chatbot.
@@ -340,23 +351,23 @@ Chatbots have a similar json configuration object which defines included knowled
 To flexibly and scalably store data for multiple knowledge bases and chatbots, Paisley uses a schemaless noSQL database. DocumentDB provides built-in support for vector similarity search and easily stores json objects.
 
 
-#### 5.2.3 Specialized vector databases
+#### 5.3.3 Specialized vector databases
 
 We also considered the use of specialized vector databases, such as Milvus, Qdrant, Chroma, and others. Although specialized databases may have provided some performance benefit and simplified the retrieval implementation, we didn’t feel that the potential performance benefits would outweigh the drawbacks:
 <ul>
   <li>Many of these databases are hosted solutions. Although some offer self-hosting options, this would have increased complexity.</li>
-  <li>Featureset and offerings from some vector databases are rapidly changing - during the initial prototyping we conducted with some vector databases we noticed that SDK methods had deprecated only 2 weeks later.</li>
+  <li>Feature set and offerings from some vector databases are rapidly changing - during the initial prototyping we conducted with some vector databases we noticed that SDK methods had deprecated only 2 weeks later.</li>
 </ul>
 
 The stable, established nature of DocumentDB is aligned with our goal of simplifying things for small teams. Use of a “standard” database simplifies troubleshooting and maintenance, and provides maximum flexibility.
 
-#### 5.2.4 Evaluations
+#### 5.3.4 Evaluations
 
 Evaluations data includes a time-based history of user queries, retrieved context, LLM responses, and the corresponding evaluation metrics. This data was highly structured and was being stored with the goal of supporting future RAG performance analysis and comparison. 
 
 Paisley uses the AWS RDS relational database (PostgreSQL-compatible) to store evaluations data.
 
-### 5.3 Paisley source code
+### 5.4 Paisley source code
 
 Paisley’s back-end is written entirely in Python. Our API endpoints use the FastAPI framework on the backend to serve our API endpoints. Python was a logical language choice given the depth and breadth of existing libraries and frameworks in the Python ecosystem. It is the most common language for AL/ML-related projects.
 
@@ -364,7 +375,7 @@ As an open-source “starter-kit”, our intent was to provide small teams the f
 
 LlamaIndex exposes key RAG elements (nodes, indexes, retrievers) simply, allowing us to create and flexibly integrate multiple knowledge bases, each with unique settings, into a single chatbot. Built-in integrations also made it easy to connect ingested data, both raw and embedding, to a variety of databases. This flexibility allowed us to consider different RAG-related database solutions as discussed in Section 5.2 above. The library also helped streamline the implementation of the post-processing strategies discussed in sections 2 and 4 above. Finally, LlamaIndex has an active open-source community. Developers are able to implement, integrate, and share custom features they’ve created on LlamaHub making it easier for anyone to expand the scope of our project.
 
-#### 5.3.1 Knowledge base component
+#### 5.4.1 Knowledge base component
 Our application is broken up into several components. The knowledge base component interacts with DocumentDB to:
 <ul>
   <li>store and retrieve json configurations, and</li>
@@ -374,12 +385,12 @@ As you can see from the diagram below, the knowledge base calls an external API 
 
 <img src='/img/5-3-1-code-kb.png' alt='code diagram - knowledge bases' />
 
-#### 5.3.2 Chatbot component
+#### 5.4.2 Chatbot component
 The chatbot component accesses json configuration files from DocumentDB. From the diagram below, you can see that this component also calls an external API to embed user queries. Query embeddings are then used to access DocumentDB, the primary point of integration with the knowledge base to conduct vector similarity search and retrieve context for the LLM.
 
 <img src='/img/5-3-2-code-chatbot.png' alt='code diagram - chatbot' />
 
-#### 5.3.3 Evaluations component
+#### 5.4.3 Evaluations component
 
 The evaluations component is the most distinct from the other two components. It receives query, context, and response information derived from the chatbot component, loads the appropriate evaluation libraries, and leverages LLMs to calculate the evaluation metrics discussed in Section 4 above. This process can be time-consuming as it relies on external APIs.  As a blocking operation, it would significantly delay query response to the user. As such, we serialize this information as a background processing task via a Python Celery client. Celery is a popular task queue in Python that can be used to quickly implement background tasks.
 
@@ -399,7 +410,7 @@ Our solution to this challenge was the architecture described in Section 5.3.3 a
 
 <img src='/img/6-1-0-background.png' alt='background processing' />
 
-An added benefit was that subsequent testing demonstrated an increased number of concurrent users (50+) that our AWS Paisley infrastructure could handle - this was almost double (1.8 times) the number of concurrent users as compared to our prior architecture. This improvement more than allows for a small organization in our use case to satisfy internal demand for immediate answers.
+An added benefit was that subsequent testing demonstrated an increased number of concurrent users (50+) that our AWS Paisley infrastructure could handle - this was almost double (1.8 times) the initial number of concurrent users (~30) as compared to our prior architecture. This improvement more than allows for a small organization in our use case to satisfy internal demand for immediate answers, especially considering number of true concurrent users to likely be much lower.
 
 ### 6.2 Modular plug-in architecture for evaluations
 

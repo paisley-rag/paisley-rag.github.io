@@ -63,14 +63,14 @@ toc_max_heading_level: 4
 ### 1.1  What is Paisley?
 Paisley is an open-source framework to help IT or engineering teams quickly set up and deploy chatbots that incorporate team-defined data. It achieves this through Retrieval-Augmented Generation (RAG).
 
-RAG is an approach for enhancing the capabilities of Large Language Models (LLMs) with an external store of (often proprietary) information[^1]. With a RAG system, users make natural language queries to retrieve information from an external knowledge base. This retrieved information is then included in a prompt to an LLM, such as OpenAI's GPT-4o or Anthropic’s Claude 3.5 Sonnet.
+RAG is an approach for enhancing the capabilities of Large Language Models (LLMs) with an external store of (often proprietary) information[^1]. With a RAG system, users make natural language queries that retrieve information from an external knowledge base. This retrieved information is then included in a prompt to an LLM, such as OpenAI's GPT-4o or Anthropic’s Claude 3.5 Sonnet.
 
 Although a basic prototype RAG chatbot can be quickly created from numerous online tutorials and open-source libraries, deploying a production-ready chatbot involves a number of additional steps which require knowledge, libraries, and infrastructure to realize.
 
 ###  1.2 Use Case
-Paisley was created as an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables teams of around 20 people with limited resources and time to skip some of the research, easily set up knowledge bases, and more quickly deploy internal RAG chatbots.
+Paisley is an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables teams of around 20 people with limited resources and time to skip some of the research, easily set up knowledge bases, and more quickly deploy internal RAG chatbots.
 
-Paisley may be a fit in any scenario where there may be a distribution of duties: a busy technical expert who may help to set up the chatbot infrastructure, an information owner who sets up the knowledge base, and the ultimate consumers of that information - other people with questions.
+Paisley may be a fit in any scenario where there is a distribution of duties: a busy technical expert who may help to set up the chatbot infrastructure, an information owner who sets up the knowledge base, and the ultimate consumers of that information - other people with questions.
 
 
 ## 2.  What is RAG?

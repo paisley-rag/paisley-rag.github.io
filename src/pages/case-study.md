@@ -61,7 +61,7 @@ toc_max_heading_level: 4
 ## 1. Introduction
 
 ### 1.1  What is Paisley?
-Paisley is an open-source framework to help IT or engineering teams quickly set up and deploy chatbots that respond based upon user-defined data. It achieves this through Retrieval-Augmented Generation (RAG).
+Paisley is an open-source framework to help IT or engineering teams quickly set up and deploy chatbots that incorporate team-defined data. It achieves this through Retrieval-Augmented Generation (RAG).
 
 RAG is an approach for enhancing the capabilities of Large Language Models (LLMs) with an external store of (often proprietary) information[^1]. With a RAG system, users make natural language queries to retrieve information from an external knowledge base. This retrieved information is then included in a prompt to an LLM, such as OpenAI's GPT-4o or Anthropic’s Claude 3.5 Sonnet.
 
@@ -320,9 +320,9 @@ In support of this objective, we picked AWS as a cloud infrastructure provider b
 
 ### 5.1 Web architecture
 
-Since Paisley is deployed on AWS cloud infrastructure we adopt a number of web application conventions to make our UI accessible and secure. On an EC2 server a web server (Nginx) serves our UI, which interacts with the Paisley application server, which connects to our back end databases, as described in the rest of Section 5 below.
+Since Paisley is deployed on AWS cloud infrastructure we adopt a number of web application conventions to make our UI accessible and secure. A web server (Nginx) serves our UI. This UI interacts with the Paisley application server, which connects to our back-end databases. The EC2 instance which hosts both our web server and application server, and databases are described further in the rest of Section 5 below.
 
-Given the latency inherent in external API calls to embedding models and LLMs, we opted to implement our UI as a single page application using optimistic UI updates where sensible. The Paisley UI is built in React-Typescript using Tailwind CSS (https://tailwindcss.com/) and shadcn/ui components (https://ui.shadcn.com/).
+Given the latency inherent in external API calls to embedding models and LLMs, we opted to implement our UI as a single page application using optimistic UI updates, where sensible. The Paisley UI is built in React-Typescript using Tailwind CSS (https://tailwindcss.com/) and shadcn/ui components (https://ui.shadcn.com/).
 
 To make the application server accessible for users, the deployed EC2 instance has a publicly accessible IP address. To secure the IP address and the associated API routes Paisley uses JWT authentication.
 

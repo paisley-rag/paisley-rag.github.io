@@ -68,7 +68,7 @@ RAG is an approach for enhancing the capabilities of Large Language Models (LLMs
 Although a basic prototype RAG chatbot can be quickly created from numerous online tutorials and open-source libraries, deploying a production-ready chatbot involves a number of additional steps which require knowledge, libraries, and infrastructure to realize.
 
 ###  1.2 Use Case
-Paisley is an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables teams of around 20 people with limited resources and time to skip some of the research, easily set up knowledge bases, and more quickly deploy internal RAG chatbots.
+Paisley is an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables teams of around 20 people to rapidly configure, deploy, and evaluate internal RAG chatbots.
 
 Paisley may be a fit in any scenario where there is a distribution of duties: a busy technical expert who may help to set up the chatbot infrastructure, an information owner who sets up the knowledge base, and the ultimate consumers of that information - other people with questions.
 
@@ -79,15 +79,15 @@ Before delving into the existing solutions for setting up a RAG chatbot, it may 
 
 ### 2.1  LLMs
 
-Generative AI and the LLMs that power it are a transformative technology. By prompting an LLM, a user is able to generate creative content such as articles, stories, and marketing materials. They’re capable of generating summaries and providing real-time conversation to enhance the speed and depth of learning. 
+Generative AI and the LLMs that power it are a transformative technology. By prompting an LLM, a user is able to generate creative content such as articles, stories, and marketing materials.
 
 It’s common for an LLM to provide authoritative yet inaccurate responses or “hallucinate”. LLMs are typically trained on a snapshot of the internet and thus unable to generate accurate responses to queries about current events or real-time data. Similarly, LLMs have no access to proprietary information not included in their training data.
 
-Although LLM performance can be improved by adding new data and additional training through a technique known as *fine tuning*, effective implementation requires a high level of technical skill, time, and cost.
+Although LLM performance can be improved training through *fine tuning*, effective implementation requires a high level of technical skill, time, and cost.
 
 
 #### 2.1.1  What is a prompt?
-When using a chat interface, a user’s question (the *query*) is only part of what is submitted to the LLM. The query is combined with additional text (the *context*), and instructions within a *prompt* to guide the LLM in generating a response. The ability for an LLM to remember parts of the conversation or prior responses comes from the history of the conversation being aggregated and re-submitted as context with each subsequent user input.
+When using a chat interface, a user’s question (the *query*) is only part of what is submitted to the LLM. The query is combined with additional text (the *context*), and instructions within a *prompt* to guide the LLM in generating a response.
 
 <img src='/img/2-1-1-prompt1.png' alt='example of prompt' />
 <img src='/img/2-1-1-prompt2.png' alt='example of prompt' style={{display: 'block', margin: 'auto'}} />
@@ -113,7 +113,7 @@ The next step of ingestion is to convert chunked data into an array of numbers (
 
 Similar chunks of data are represented by similar vectors.
 
-In the final step of ingestion each chunk’s embedding is then stored in a vector database (a database optimized to store and retrieve vectors) along with the corresponding text of that chunk. The process of chunking, embedding, and storing the initial data is sometimes referred to as *indexing*.
+In the final step of ingestion each chunk’s embedding is then stored in a vector database (a database optimized to store and retrieve vectors) along with the corresponding text of that chunk.
 
 <img src='/img/2-2-1-kb-embed3.png' alt='embedding3' />
 
@@ -133,21 +133,21 @@ In the diagram below, we summarize the steps involved in retrieval from and disc
   <li>User submits a query.</li>
   <li>Query is embedded via the same embedding model used for ingestion. If different knowledge bases use different embedding models, the query will be embedded multiple times, once for each knowledge base.</li>
   <li>(The appropriate) query embedding is used for vector similarity search against the embeddings in each vector DB.</li>
-  <li>Relevant text chunks are returned from vector similarity search of each knowledge base and combined, and</li>
-  <li>Instructions, combined context (all relevant text chunks), and user query is sent to the LLM as a prompt to generate a response.</li>
+  <li>Relevant text chunks are returned from vector similarity search of each knowledge base and combined.</li>
+  <li>Instructions, context (all relevant text chunks), and user query are combined into a single prompt and sent to the LLM to generate a response.</li>
 </ol>
 
 <img src='/img/2-2-2-kb-query2-alt.png' alt='retrieval with knowledge base' />
 
 ### 2.3 Post-processing context
 
-Above, we’ve outlined a relatively simple RAG process involving indexing and retrieval prior to a response from the LLM. If additional knowledge bases are added, each representing different choices in how documents are ingested to best suit content type, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context can significantly improve RAG performance[^2].
+Above, we’ve outlined a relatively simple RAG process involving ingestion and retrieval prior to a response from the LLM. Additional knowledge bases might each represent different choices in how documents are ingested to best suit content type. If additional knowledge bases are added, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context can significantly improve RAG performance[^2].
 
-To manage the volume of retrieved context, some filtering of context before submission to the LLM improves RAG performance.  Once context is retrieved, rejecting the context that may be least relevant (i.e., the corresponding vector is least similar to the query) helps to reduce computational resources and/or LLM token costs. This process is known as *similarity filtering*.
+To reduce the volume of retrieved text, the least relevant context can be rejected, improving the quality of generated responses and reducing computational resources and LLM token costs. This process is known as *similarity filtering*.
 
-A more computationally intensive but more effective method of context post-processing is called *reranking*. This involves using a model to compare the user’s original query against each of the returned text chunks to determine which context is most relevant to the user query and selecting the top results. Although effective, this additional step can be computationally expensive, increasing latency, and as a result of the additional embedding and comparison steps, also increase LLM token costs.
+The retrieved context may not be ordered, especially if context from multiple knowledge bases is combined. Through a process know as *reranking*, an embedding model compares the user's original query against each of the returned text chunks to determine which context is most relevant. Typically, only the top results are incorporated into the prompt sent to the LLM. More effective rerankers will incur a greater computational and LLM token cost.
 
-Finally, the order of each text chunk to be submitted to the LLM affects the quality of the final response. The most relevant context should be placed primarily at the very end of the submitted context, or the beginning; context placed in the middle can be easily overlooked by LLMs. This is commonly known as *reordering*.
+Finally, the order of the retrieved context submitted to the LLM affects the quality of the final response. The most relevant context should be placed at either the beginning or end of the submitted context. Context placed in the middle can be overlooked by LLMs. This is commonly known as *reordering*.
 
 <img src='/img/2-3-0-chatbot.png' alt='chatbot' />
 
@@ -157,7 +157,7 @@ Different LLMs may have limitations on the amount of context they can process an
 
 ### 2.4 Evaluating a RAG system
 
-Above, we’ve outlined a RAG process involving indexing, retrieval, and post-processing of context prior to LLM generation. The complexity in RAG arises from the vast number of options available for even just those three initial steps, all of which can greatly impact the quality of the LLM response. As a result, a structured method for evaluating RAG performance is critical.
+Above, we’ve outlined a RAG process involving ingestion, retrieval, and post-processing of context prior to LLM generation. The complexity in RAG arises from the vast number of options available for even just those three initial steps, all of which can greatly impact the quality of the LLM response. As a result, a structured method for evaluating RAG performance is critical.
 
 There are two key areas of evaluation: 
 <ul>
@@ -165,9 +165,9 @@ There are two key areas of evaluation:
 <li>final answer generated by the LLM.</li>
 </ul>
 
-Ultimately, the best evaluations will be those involving a team of subject matter experts to create a reference dataset identifying expected context and generated response for each query - a time-consuming and expensive process.
+Ultimately, the best evaluations involve a team of subject matter experts who create a reference dataset identifying expected context and generated response for each query - a time-consuming and expensive process.
 
-The powerful LLM’s today are becoming increasingly capable and can also be used to support evaluations with or without reference datasets[^6]. Evaluation frameworks exist that utilize LLMs to judge each question, context, and generated response, and assign scores of relative quality. Low scores across a variety of different queries indicate opportunities to improve RAG configuration options.
+LLM are increasingly capable of supporting evaluations with or without reference datasets[^6]. Evaluation frameworks exist that utilize LLMs to judge each question, context, and generated response, and assign scores of relative quality. Consistently low scores across user queries indicate opportunities to improve RAG configuration options.
 
 
 
@@ -178,15 +178,13 @@ Due to the current pace of development in LLMs and related applications, the num
 
 ### 3.1 Open-source libraries
 
-There are numerous open-source libraries for developers building a RAG system, but LangChain and LlamaIndex are two of the most popular. Each allows you to build a near infinite number of RAG pipeline configurations. However, a drawback to that extensive flexibility is the resulting complexity of using these libraries.
+There are numerous open-source libraries for developers building a RAG system, but LangChain and LlamaIndex are two of the most popular. Each allows you to build a near infinite number of RAG pipeline configurations, but their extensive flexibility creates implementation complexity for developers.
 
-Visual frameworks, such as RagFlow or Langflow simplify the process of constructing a RAG pipeline. These frameworks might leverage open-source libraries, but add a User Interface (UI) and an additional layer of abstraction. The configurability of these frameworks will typically be limited to the options chosen in their implementation. However, the UI enables a less technical user to more easily access configurations.
-
-Open-source libraries exist for evaluating the quality of context and responses from RAG systems, ranging from lightweight command-line tools to fully-featured applications with visual UIs. These are generally all distinct evaluation-specific packages that need to be configured and set up as additional components to an existing RAG application.
+Open-source libraries exist for evaluating the quality of context and responses from RAG systems, ranging from lightweight command-line tools to fully-featured applications with visual UIs. These are generally distinct evaluation-specific packages that need to be configured and integrated as additional components to an existing RAG application.
 
 <img src='/img/3-1-0-opensource.png' alt='open source libraries' />
 
-In general, open-source libraries do not provide support for deployment. At most, they create a locally-hosted API endpoint for user interaction and testing. As a result, the burden of provisioning infrastructure to support the pipeline and creating an interface for the pipeline is placed on the developer.
+In general, open-source libraries do not provide support for deployment. At most, they create a locally-hosted API endpoint for user interaction and testing. As a result, the burden of provisioning infrastructure to support the pipeline and creating an interface for it is placed on the developer.
 
 ### 3.2 Hosted solutions
 
@@ -202,13 +200,13 @@ For example, Mendable (https://www.mendable.ai/) is a hosted solution that align
 
 We developed Paisley - an open-source RAG pipeline “starter kit” - to enable developers to quickly deploy and methodically iterate on the chatbots they create by providing an opinionated set of configuration options and RAG components. 
 
-Our goal was to strike a balance between the overwhelming complexity of the fragmented open-source landscape and the limited flexibility of non-enterprise paid solutions.
-
 In the table below, we’ve chosen a representative open-source framework (RAGFlow) and hosted solution (Mendable) to make a comparison of products that fit our use case for quickly setting up a RAG chatbot with a user-defined knowledge base.
 
 <img src='/img/4-0-0-1comparison.png' alt='comparison of Paisley to open source and hosted solutions' />
 
 Given the complex, evolving open-source ecosystem, a user who wants to build and deploy their own RAG chatbot will need to assemble and integrate each of the various components by themselves. For a user who wants to maintain complete control of their proprietary data, this may be the best approach, but will require time and expertise to implement.
+
+Our goal was to strike a balance between the overwhelming complexity of the fragmented open-source landscape and the limited flexibility of non-enterprise paid solutions.
 
 Paisley can be broken down into three main configurable components: 
 <ul>
@@ -224,7 +222,7 @@ In addition, we provide a command line interface to consolidate the process of d
 
 ### 4.1 Knowledge bases
 
-A knowledge base is a collection of documents with similar content properties that are chunked and embedded the same way. Paisley allows users to create as many knowledge bases as they would like, allowing users flexibility so they may ingest different types of data optimally.
+A knowledge base is a collection of documents with similar content properties chunked and embedded according to the same configuration. Paisley allows users to create as many knowledge bases as they would like, providing the flexibility to ingest different types of data optimally.
 
 <img src='/img/4-1-0-kb1-alt.png' alt='Paisley screenshot - knowledge bases' style={{border: "2px solid darkgray"}}/>
 
@@ -232,7 +230,7 @@ The way a document is processed and stored within a database has a significant i
 
 The sentence splitter is designed to keep sentences and paragraphs together. Preserving the structure of natural language during the chunking process is better than arbitrary word length chunking strategies. 
 
-The semantic splitter uses an embedding model to compare the semantic meaning of sentences and then groups those sentences into semantically similar chunks. Note that the semantic chunking strategy utilizes an embedding model twice. First by embedding each sentence for similarity comparison and grouping and again to create embeddings for each group.
+The semantic splitter uses an embedding model to compare the semantic meaning of sentences, then groups similar sentences into chunks. Note that the semantic chunking strategy utilizes an embedding model twice. First by embedding each sentence for similarity comparison and grouping, and again to create embeddings for each group.
 
 The markdown splitter is implemented through the use of a 3rd party LlamaParse API. This external API can selectively apply more advanced strategies to convert images to text through Optical Character Recognition (OCR), and add markdown headings and structure to data from tables or figures. The returned markdown is then chunked and embedded by Paisley. While this approach allows for the effective ingestion of more complex files (e.g. table data), it relies on an external service and an LLM before embedding can occur. As a result, it is a time-intensive process.
 
@@ -242,7 +240,7 @@ We also allow users to select from a variety of embedding models to find the bes
 
 <img src='/img/4-1-0-kb3-alt.png' alt='Paisley screenshot - knowledge bases' style={{border: "2px solid darkgray"}}/>
 
-These options empower users to try and evaluate various settings and rapidly iterate on the knowledge base configurations that are best suited to their content. 
+Together, these options empower users to evaluate various settings and rapidly iterate on the knowledge base configurations that are best suited to their content.
 
 Once a knowledge base has been configured and created, users are able to upload their files to be processed according to these settings.
 
@@ -250,7 +248,7 @@ Once a knowledge base has been configured and created, users are able to upload 
 
 ### 4.2 Chatbots
 
-Chatbots can connect to one or more knowledge bases to retrieve relevant context of a user’s query, prompt a LLM, and generate a response. 
+Chatbots connect to one or more knowledge bases to retrieve the relevant context for a user’s query, prompt a LLM, and generate a response.
 
 Paisley allows users to create multiple chatbots, where each chatbot can be associated with one or more knowledge bases. 
 
@@ -259,54 +257,50 @@ Paisley allows users to create multiple chatbots, where each chatbot can be asso
 
 Users can associate the same knowledge base with multiple chatbots to facilitate the evaluation of various chatbot configurations.
 
-Although context post-processing can improve RAG performance, it creates an additional computational, token/LLM cost, and resulting increase in query response time. As a result, post-processing is provided as options for users to configure.
+Although context post-processing can improve RAG performance, it requires additional computational resources, increasing query response time. Use of the reranker will further increase token costs. For these reasons, all post-processing strategies are optional.
 
 The similarity filter compares each retrieved context with the user’s query and scores the similarity between the two. It then discards retrieved context with similarity scores below a predefined threshold, ensuring only the most relevant context is used in the prompt sent to the LLM. 
 
-For reranking, we selected a reranking methodology known as ColBERT[^5], to compare each of the retrieved context against the original user query to find the most relevant text chunks. The “top n” option defines the number of top results to keep for submission to the LLM. This is the most computationally and token/cost expensive of the post-processing options offered.  
+For reranking, we selected a reranking methodology known as ColBERT[^5]. The collection of retrieved context is compared against the original user query and ranked in order of relevancy. The “top n” option defines the number of top results to send to the LLM. This is the most computationally and token/cost expensive of the post-processing options offered.
 
 “Long Context Reorder” reorders the retrieved chunks prioritizing chunks providing broader, more comprehensive context so that longer, more informative content is given higher importance in the results. 
 
-Users can also define a custom prompt that wraps the user’s query and the retrieved context guiding the response generated by an LLM. This allows for more specific instructions (*prompt engineering*) to define how the LLM generates a response from a query and its retrieved context.
+Users can also define an instructive prompt that wraps the user’s query and the retrieved context; this form of *prompt engineering* defines how the LLM generates a response from the query and its retrieved context.
 
-All post processing strategies and the instructive prompt configurations are optional. Users are able to turn each of them on and off as they see fit. 
 
 <img src='/img/4-2-0-chatbot2-alt.png' alt='Paisley screenshot - chatbots' style={{border: "2px solid darkgray"}}/>
 
 ### 4.3 Evaluations
 
-Given Paisley’s "quick-start" use case, we opted to include automatic, LLM-assigned evaluations. Whenever users query a Paisley chatbot, evaluation metrics are automatically calculated by an LLM.  A history of all queries, associated context, generated LLM response, and metrics are visible on the History and Metrics pages. Using the provided evaluation metrics, the user is able to compare a chatbot’s historical query performance and measure RAG performance over time. Using these metrics in conjunction with the configuration options mentioned above, the user is able to quickly determine the results of their changes.
+Given Paisley’s "quick-start" use case, we opted to include automatic, LLM-assigned evaluations. Whenever users query a Paisley chatbot, evaluation metrics are automatically calculated by an LLM.  A history of all queries, associated context, generated LLM response, and metrics are visible on the History and Metrics pages.
+
+<img src='/img/4-3-0-eval1-alt.png' alt='Paisley screenshot - evaluations' style={{border: "2px solid darkgray"}}/>
+<img src='/img/4-3-0-eval2-alt.png' alt='Paisley screenshot - evaluations' style={{border: "2px solid darkgray"}}/>
+
+The user is able to compare a chatbot’s historical query performance and measure RAG performance over time with the provided evaluation metrics. Using these metrics as a guide, the user can quickly evaluate the performance of their chatbots and reconfigure as needed.
 
 We’ve chosen three metrics to assess context retrieval and answer quality:
 <ul>
-  <li>Answer relevance: How well does the generated response address the user query?</li>
   <li>Context relevance: How relevant are the chunks retrieved for the user query?</li>
+  <li>Answer relevance: How well does the generated response address the user query?</li>
   <li>Faithfulness: How accurately does the generated response utilize the retrieved context?</li>
 </ul>
 
+Context relevance is a key consideration for someone iterating on a RAG system – what context was returned by the retrieval mechanism, and is it relevant to the user query? This is possibly the most important metric to consider in a RAG system as the quality of retrieved context contributes directly to the quality of the response.
+
 Answer relevance is the first thing that the end-user of the chatbot will notice – is the chatbot’s response relevant to my question? Low answer relevancy can indicate poor retrieval quality or that the documents don’t have information relevant to the question.
 
-Context relevance is another key consideration for someone iterating on a RAG system – what context was returned by the retrieval mechanism, and is it relevant to the user query? This is possibly the most important metric to consider in a RAG system as the quality of retrieved context contributes directly to the quality of the response.
+Faithfulness is a measure of the generated response and how it relates to the retrieved context. A low faithfulness score might indicate the generated response includes hallucinations or makes use of information outside the retrieved context.
 
-Faithfulness is a measure of the generated response and how it relates to the retrieved context. If the generated response includes hallucinations or makes use of information outside of the retrieved context, this will be reflected in the faithfulness metric.
+<img src='/img/2-4-0-evaluations-alt.png' alt='evaluations metrics' />
 
-<img src='/img/2-4-0-evaluations.png' alt='evaluations metrics' />
-
-Scores are assigned to each metric for every query, the retrieved context, and generated LLM response. Answer relevance and Faithfulness scores are assigned by an LLM using the RAGAs framework (https://docs.ragas.io/en/stable/), and contextual relevance scores are calculated by an LLM using DeepEval (https://docs.confident-ai.com/docs/metrics-introduction). 
-
- A summary of the chatbot interaction history is displayed within the “History” tab.
-
-<img src='/img/4-3-0-eval1-alt.png' alt='Paisley screenshot - evaluations' style={{border: "2px solid darkgray"}}/>
-
-A graph of response metrics associated with a particular chatbot is displayed within the “Metrics” tab.
-
-<img src='/img/4-3-0-eval2-alt.png' alt='Paisley screenshot - evaluations' style={{border: "2px solid darkgray"}}/>
+Scores are assigned to each metric for every query, the retrieved context, and generated LLM response. Answer relevance and faithfulness scores are assigned by an LLM using the RAGAs framework (https://docs.ragas.io/en/stable/). Contextual relevance scores are calculated by an LLM using DeepEval (https://docs.confident-ai.com/docs/metrics-introduction).
 
 Considering that specific RAG use cases may want to utilize different metrics for evaluations, we offer the above metrics out-of-the-box while allowing users the flexibility to add their own. Paisley’s plug-in evaluation architecture allows users to remove unwanted metrics or add metrics by creating custom Python modules and updating an evaluation configuration file.
 
 ### 4.4 Command line interface
 
-To use Paisley, you must have an AWS account. In preparation, you should log into your AWS account and define IAM Roles and create access keys for Paisley. Also ensure you have the AWS CLI,  Node, and NPM installed on your machine.
+To use Paisley, you must have an AWS account. Before deployment, log into your AWS account, define IAM Roles, and create access keys for Paisley. Also ensure you have the AWS CLI, Node, and NPM installed on your machine.
 
 Once these preliminary steps are complete you can download the Paisley application to your laptop. We document a series of steps and provide AWS CDK (Cloud Development Kit) scripts to streamline deploying (and tearing down) Paisley infrastructure. If desired, multiple concurrent instances of Paisley can be deployed onto their own distinct infrastructure using the same scripts.
 
@@ -314,9 +308,9 @@ The UI discussed above is automatically available once the server is deployed by
 
 ## 5. Paisley design
 
-As mentioned in Sections 1 and 3, our primary goal was to create a RAG chatbot “starter-kit” for small teams that contained all of the major components and was easy to set up and deploy.
+As mentioned in Sections 1 and 3, our primary goal was to create an easy to set up and deploy RAG chatbot “starter-kit” for small teams.
 
-In support of this objective, we picked AWS as a cloud infrastructure provider because it is commonly used and has all of the major building blocks we need to stand-up a chatbot used by ~20 people.
+In support of this objective, we picked AWS as a cloud infrastructure provider because it is commonly used and has all of the major building blocks we need to stand-up chatbots used by ~20 people.
 
 ### 5.1 Web architecture
 
@@ -389,15 +383,15 @@ LlamaIndex exposes key RAG elements (nodes, indexes, retrievers) simply, allowin
 #### 5.4.1 Knowledge base component
 Our application is broken up into several components. The knowledge base component interacts with DocumentDB to:
 <ul>
-  <li>store and retrieve json configurations, and</li>
+  <li>store and retrieve knowledge base json configurations, and</li>
   <li>store text chunks and associated embeddings for retrieval.</li>
 </ul>
-As you can see from the diagram below, the knowledge base calls an external API to access the embedding model.
+The knowledge base calls an external API and passes it text chunks from the document. The embeddings returned from that API are received by the knowledge base component and stored within DocumentDB.
 
 <img src='/img/5-3-1-code-kb.png' alt='code diagram - knowledge bases' />
 
 #### 5.4.2 Chatbot component
-The chatbot component accesses json configuration files from DocumentDB. From the diagram below, you can see that this component also calls an external API to embed user queries. Query embeddings are then used to access DocumentDB, the primary point of integration with the knowledge base to conduct vector similarity search and retrieve context for the LLM.
+The chatbot component accesses its json configuration files from DocumentDB. This component then takes the user query, sends it to an external API for embedding, and uses the result to search DocumentDB. Relevant text chunks retrieved from DocumentDB are then combined with the user query and instructions, and sent as a prompt to the LLM. The returned response is then sent to the user.
 
 <img src='/img/5-3-2-code-chatbot.png' alt='code diagram - chatbot' />
 
@@ -405,7 +399,7 @@ The chatbot component accesses json configuration files from DocumentDB. From th
 
 The evaluations component is the most distinct from the other two components. It receives query, context, and response information derived from the chatbot component, loads the appropriate evaluation libraries, and leverages LLMs to calculate the evaluation metrics discussed in Section 4 above. This process can be time-consuming as it relies on external APIs.  As a blocking operation, it would significantly delay query response to the user. As such, we serialize this information as a background processing task via a Python Celery client. Celery is a popular task queue in Python that can be used to quickly implement background tasks.
 
-AWS SQS (Simple Queue Service) is used as a message broker to store tasks which are then processed by the Celery task worker. This task worker then executes evaluations tasks and persists the data within RDS so it can be queried and retrieved by the UI.
+AWS SQS (Simple Queue Service) is used as a message broker to store tasks which are then processed by the Celery task worker. This task worker then executes evaluations tasks and persists the data within RDS so that it can be queried and retrieved by the UI.
 
 Additional discussion and rationale on this architecture can be found in Section 6.1 below.
 
@@ -427,11 +421,11 @@ An added benefit was that subsequent testing demonstrated an increased number of
 
 There are many open-source evaluations libraries and frameworks available. To enable a solution that would be quick and easy for our intended use case, we explored LLM-automated evaluation scoring.
 
-After prototyping with some libraries, we initially decided to integrate the RAGAs Framework into Paisley. In alignment with our “quick-start” objective, RAGAs worked well for users with no reference dataset of expected questions and answers, and we liked the level of resolution provided by the automated scoring. Where some libraries seemed to return the same score for every query/context/result, the metrics returned by RAGAs seemed more nuanced. However, after working with RAGAs, we also realized that without a reference dataset the only automated metrics available were LLM-response evaluation metrics. To incorporate a context evaluation metric for users without a reference dataset, another evaluation package was necessary.
+After prototyping with some libraries, we initially decided to integrate the RAGAs Framework into Paisley. In alignment with our “quick-start” objective, RAGAs worked well for users with no reference dataset of expected questions and answers. We also liked the level of resolution provided by the automated scoring. Where some libraries seemed to return the same score for every query/context/result, the metrics returned by RAGAs were more nuanced. However, after working with RAGAs, we also realized that without a reference dataset the only automated metrics available were LLM-response evaluation metrics. To incorporate a context evaluation metric for users without a reference dataset, another evaluation package was necessary.
 
 We realized that the need to compare, and possibly utilize, different evaluation packages is an inherent challenge of RAG development, especially given the current pace of evolution in the tools and libraries.
 
-Our solution to this challenge was to implement a flexible “plug-in” architecture for evaluations. A json configuration file defines any number of python modules (files) to be loaded and executed by Paisley. The user can create a custom evaluation function which takes Paisley-provided inputs; a user query, retrieved context strings, and generated LLM response; and produces as output some quantitative score. These functions can be implemented directly by the user, if desired, or they can import and leverage any 3rd party libraries. Paisley will execute all configured evaluation functions and log the responses to the same evaluation database and make the scores visible within the UI.
+Our solution to this challenge was to implement a flexible “plug-in” architecture for evaluations. A json configuration file defines any number of python modules (files) to be loaded and executed by Paisley. The user can create a custom evaluation function which takes Paisley-provided inputs - a user query, retrieved context strings, and generated LLM response - and produces as output some quantitative score. These functions can be implemented directly by the user, if desired, or they can import and leverage any 3rd party libraries. Paisley will execute all included evaluation modules and log the responses to the same evaluation database. Configured scores will be visible within the UI.
 
 <img src='/img/6-2-0-plugin.png' alt='plug in architecture' />
 

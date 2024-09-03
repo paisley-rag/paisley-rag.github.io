@@ -23,10 +23,10 @@ const Team = () => {
               name="Grace Lim"
               // image="img/team/grace"
               location="Toronto, Canada"
-              // personalWebsite="https://www.dylanspyer.com"
-              github="https://github.com/dylanspyer"
-              linkedin="https://www.linkedin.com/in/dylan-spyer/"
-              email="dylanspyer@gmail.com"
+              // personalWebsite=""
+              github="https://github.com/yg-lim"
+              linkedin="https://www.linkedin.com/in/grclm"
+              email="yglim@proton.me"
             />
             <Member
               name="James Chew"

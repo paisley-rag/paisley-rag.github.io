@@ -1,27 +1,28 @@
 interface MemberProps {
-  image: string;
+  // image: string;
   name: string;
   location: string;
-  personalWebsite: string;
+  // personalWebsite: string;
   github: string;
   linkedin: string;
   email: string;
 }
 
 function Member({
-  image,
+  // image,
   name,
   location,
-  personalWebsite,
+  // personalWebsite,
   github,
   linkedin,
   email,
 }: MemberProps) {
   return (
+    <>
     <div className="portrait-card flex flex-col">
-      <div className="">
+      {/* <div className="">
         <img className="max-h-64 portrait-img" src={image} />
-      </div>
+      </div> */}
       <p className="lp-name text-gray-800 dark:text-gray-300 text-lg font-semibold text-left mt-2 mb-0 p-override text-center pb-4 md:pb-0">
         {name}
       </p>
@@ -29,7 +30,7 @@ function Member({
         {location}
       </p>
       <div className="flex gap-1 mx-auto mt-4">
-        <a
+        {/*<a
           href={personalWebsite}
           target="_blank"
           className="inline-block text-willowGreen-600 hover:text-willowGreen-400 dark:text-willowGreen-300 dark:hover:text-willowGreen-100"
@@ -53,7 +54,7 @@ function Member({
             <path d="M11.5 3a17 17 0 0 0 0 18"></path>
             <path d="M12.5 3a17 17 0 0 1 0 18"></path>
           </svg>
-        </a>
+        </a> */}
         <a
           href={github}
           target="_blank"
@@ -123,6 +124,7 @@ function Member({
         </a>
       </div>
     </div>
+    </>
   );
 }
 

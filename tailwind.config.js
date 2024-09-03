@@ -25,6 +25,7 @@ module.exports = {
         // right: "#ad1acb",
         right: "#AE24E0",
         accent: "#D2EAFE",
+        paisleyPurple: "#190d5b",
         // paisleyPink: {
         //   100: "#f7d2ff",
         //   200: "#efa6ff",

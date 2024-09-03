@@ -216,7 +216,21 @@ These components are accessible via a web-based UI that supports configuring, ev
 
 <img src='/img/4-0-0-2components.png' alt='components of Paisley' />
 
-In addition, we provide a command line interface to consolidate the process of deploying a Paisley on your AWS infrastructure. 
+<div style={{marginTop: '80px'}}></div>
+The brief video below provides an overview of the key Paisley components.
+<div className="flex flex-grow flex-1 bg-white items-center justify-center">
+<video
+    src="/video/paisley_walkthrough_vid.mp4"
+    loop
+    autoPlay
+    muted
+    playsInline
+    className="flex-grow w-full"
+    > 
+</video>
+</div>
+
+In addition, we provide a command line interface (see Section 4.4) to consolidate the process of deploying a Paisley on your AWS infrastructure. 
 
 ### 4.1 Knowledge bases
 
@@ -302,7 +316,10 @@ To use Paisley, you must have an AWS account. Before deployment, log into your A
 
 Once these preliminary steps are complete you can download the Paisley application to your laptop. We document a series of steps and provide AWS CDK (Cloud Development Kit) scripts to streamline deploying (and tearing down) Paisley infrastructure. If desired, multiple concurrent instances of Paisley can be deployed onto their own distinct infrastructure using the same scripts.
 
-The UI discussed above is automatically available once the server is deployed by navigating to the assigned IP address with a web browser. This UI interacts with an API back-end which is also automatically deployed.
+<img src='/video/paisley_deploy.gif' alt='CLI demo' />
+
+Once deployment is complete, the web UI discussed above is accessed by navigating to the assigned IP address with a web browser. This UI interacts with an API back-end which is also automatically deployed.
+
 
 ## 5. Paisley design
 

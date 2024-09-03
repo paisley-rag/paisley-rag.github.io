@@ -68,14 +68,14 @@ RAG is an approach for enhancing the capabilities of Large Language Models (LLMs
 Although a basic prototype RAG chatbot can be quickly created from numerous online tutorials and open-source libraries, deploying a production-ready chatbot involves a number of additional steps which require knowledge, libraries, and infrastructure to realize.
 
 ###  1.2 Use Case
-Paisley is an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables teams of around 20 people to rapidly configure, deploy, and evaluate internal RAG chatbots.
+Paisley is an open-source, configurable, “bring-your-own-cloud” alternative to the proliferation of closed-source, paid, and typically 3rd party-hosted RAG chatbot services. Our RAG “starter-kit” enables small IT teams rapidly configure, deploy, and evaluate internal RAG chatbots.
 
 Paisley may be a fit in any scenario where there is a distribution of duties: a busy technical expert who may help to set up the chatbot infrastructure, an information owner who sets up the knowledge base, and the ultimate consumers of that information - other people with questions.
 
 
 ## 2.  What is RAG?
 
-Before delving into the existing solutions for setting up a RAG chatbot, it may be helpful to better understand what RAG is and the various considerations that may impact any decision. For readers who are familiar with RAG, feel free to skip this section and refer back only for clarification on terms used. 
+Before looking at existing solutions for setting up a RAG chatbot, it may be helpful to better understand what RAG is and the various considerations that may impact any decision. For readers who are familiar with RAG, feel free to skip this section and refer back only for clarification on terms used.
 
 ### 2.1  LLMs
 
@@ -96,7 +96,7 @@ When using a chat interface, a user’s question (the *query*) is only part of w
 ### 2.2 Basic RAG
 Most simply, RAG involves retrieving additional information about a user’s query and placing it into a prompt sent to an LLM as context.
  
-This additional information comes from one or more knowledge bases that serve as a “source of truth” for the LLM. Knowledge bases are created by breaking down files, such as a PDF, into smaller *chunks* of text. When a user submits a query (“1” in diagram below), relevant chunks are retrieved from the knowledge base(s). This retrieved text (“2”) is combined with the original query, into a prompt instructing the LLM to respond with information from the context. This prompt is then sent to the LLM (“3”) to generate a response which is based on (or *grounded* with) the retrieved information.
+This additional information comes from one or more knowledge bases that serve as a “source of truth” for the LLM. This source of truth is typically proprietary data the LLM was not trained with, for example business rules or historical data that's not publicly available. Knowledge bases are created by breaking down files, such as a PDF, into smaller *chunks* of text. When a user submits a query (“1” in diagram below), relevant chunks are retrieved from the knowledge base(s). This retrieved text (“2”) is combined with the original query, into a prompt instructing the LLM to respond with information from the context. This prompt is then sent to the LLM (“3”) to generate a response which is based on (or *grounded* with) the retrieved information.
 
 <img src='/img/2-2-0-retrieval2.png' alt='retrieval2' />
 
@@ -128,7 +128,7 @@ When a user submits a query (“1” in diagram below), it is embedded using the
 <img src='/img/2-2-2-kb-query.png' alt='querying' />
 
 #### 2.2.3 Summary of retrieval
-In the diagram below, we summarize the steps involved in retrieval from and discuss the addition of multiple knowledge bases:
+In the diagram below, we summarize the steps involved in retrieval and discuss the addition of multiple knowledge bases:
 <ol>
   <li>User submits a query.</li>
   <li>Query is embedded via the same embedding model used for ingestion. If different knowledge bases use different embedding models, the query will be embedded multiple times, once for each knowledge base.</li>
@@ -141,11 +141,11 @@ In the diagram below, we summarize the steps involved in retrieval from and disc
 
 ### 2.3 Post-processing context
 
-Above, we’ve outlined a relatively simple RAG process involving ingestion and retrieval prior to a response from the LLM. Additional knowledge bases might each represent different choices in how documents are ingested to best suit content type. If additional knowledge bases are added, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context can significantly improve RAG performance[^2].
+Above, we’ve outlined a relatively simple RAG process involving ingestion and retrieval prior to a response from the LLM. Additional knowledge bases might each represent different choices in how documents are ingested to best suit content type. If additional knowledge bases are added, the amount of retrieved context may also increase. Not all retrieved text content may be equally relevant to a user query. Thus, further processing of the retrieved context before submitting a prompt can significantly improve RAG performance[^2].
 
 To reduce the volume of retrieved text, the least relevant context can be rejected, improving the quality of generated responses and reducing computational resources and LLM token costs. This process is known as *similarity filtering*.
 
-The retrieved context may not be ordered, especially if context from multiple knowledge bases is combined. Through a process know as *reranking*, an embedding model compares the user's original query against each of the returned text chunks to determine which context is most relevant. Typically, only the top results are incorporated into the prompt sent to the LLM. More effective rerankers will incur a greater computational and LLM token cost.
+The retrieved context may not be ordered, especially if context from multiple knowledge bases is combined. Through a process known as *reranking*, an embedding model compares the user's original query against each of the returned text chunks to determine which context is most relevant. Typically, only the top results are incorporated into the prompt sent to the LLM. More effective rerankers will incur a greater computational and LLM token cost.
 
 Finally, the order of the retrieved context submitted to the LLM affects the quality of the final response. The most relevant context should be placed at either the beginning or end of the submitted context. Context placed in the middle can be overlooked by LLMs. This is commonly known as *reordering*.
 
@@ -167,9 +167,7 @@ There are two key areas of evaluation:
 
 Ultimately, the best evaluations involve a team of subject matter experts who create a reference dataset identifying expected context and generated response for each query - a time-consuming and expensive process.
 
-LLM are increasingly capable of supporting evaluations with or without reference datasets[^6]. Evaluation frameworks exist that utilize LLMs to judge each question, context, and generated response, and assign scores of relative quality. Consistently low scores across user queries indicate opportunities to improve RAG configuration options.
-
-
+LLMs are increasingly capable of supporting evaluations with or without reference datasets[^6]. Evaluation frameworks exist that utilize LLMs to judge each question, context, and generated response, and assign scores of relative quality. Consistently low scores across user queries indicate opportunities to improve RAG configuration options. As of the time of writing, the use of LLMs in evaluations is rapidly evolving.
 
 
 ## 3. Existing solutions
@@ -198,7 +196,7 @@ For example, Mendable (https://www.mendable.ai/) is a hosted solution that align
 
 ## 4. Introducing Paisley
 
-We developed Paisley - an open-source RAG pipeline “starter kit” - to enable developers to quickly deploy and methodically iterate on the chatbots they create by providing an opinionated set of configuration options and RAG components. 
+We developed Paisley - an open-source RAG pipeline “starter kit” - to enable developers to quickly deploy and methodically iterate on the chatbots they create by providing an opinionated set of configuration options and RAG components. LLM-supported evaluations are included out-of-the-box to support knowledge base and chatbot testing.
 
 In the table below, we’ve chosen a representative open-source framework (RAGFlow) and hosted solution (Mendable) to make a comparison of products that fit our use case for quickly setting up a RAG chatbot with a user-defined knowledge base.
 
@@ -218,7 +216,7 @@ These components are accessible via a web-based UI that supports configuring, ev
 
 <img src='/img/4-0-0-2components.png' alt='components of Paisley' />
 
-In addition, we provide a command line interface to consolidate the process of deploying a chatbot on your AWS infrastructure. 
+In addition, we provide a command line interface to consolidate the process of deploying a Paisley on your AWS infrastructure. 
 
 ### 4.1 Knowledge bases
 
@@ -308,9 +306,7 @@ The UI discussed above is automatically available once the server is deployed by
 
 ## 5. Paisley design
 
-As mentioned in Sections 1 and 3, our primary goal was to create an easy to set up and deploy RAG chatbot “starter-kit” for small teams.
-
-In support of this objective, we picked AWS as a cloud infrastructure provider because it is commonly used and has all of the major building blocks we need to stand-up chatbots used by ~20 people.
+As mentioned in Sections 1 and 3, our primary goal was to create an easy to set up and deploy RAG chatbot “starter-kit” for small teams. In support of this objective, we picked AWS as a cloud infrastructure provider because it is commonly used and has all of the major building blocks we need.
 
 ### 5.1 Web architecture
 
@@ -318,7 +314,7 @@ Since Paisley is deployed on AWS cloud infrastructure we adopt a number of web a
 
 Given the latency inherent in external API calls to embedding models and LLMs, we opted to implement our UI as a single page application using optimistic UI updates, where sensible. The Paisley UI is built in React-Typescript using Tailwind CSS (https://tailwindcss.com/) and shadcn/ui components (https://ui.shadcn.com/).
 
-To make the application server accessible for users, the deployed EC2 instance has a publicly accessible IP address. To secure the IP address and the associated API routes Paisley uses JWT authentication.
+To make the backend available to the UI, the EC2 instance hosts an API that the UI can access via JWT.
 
 In alignment with general web design conventions, we implemented resource-oriented REST APIs through FastAPI as part of our application server. Our primary API resource names are knowledge-bases and chatbots.
 
@@ -445,11 +441,11 @@ One problem that arises when retrieving semantically similar embeddings is that 
 
 One solution to this problem, known as *query rewriting*, is to first have an LLM generate variations on the user’s query. This can include re-phrasing the query, making it more specific, or trying to expand or use alternate phrasings. In this way, additional content is created to further improve retrieval.
 
-Another solution to this problem, known as *HyDE* (Hypothetical Document Embeddings) also involves the use of an LLM to generate content. However, rather than generate additional questions, in this scenario an LLM is prompted to generate an answer. This answer, which may have some factual inaccuracies, but should possess the longer content more representative of an embedded text chunk, is then embedded and used as part of vector similarity search in retrieval. 
+Another solution to this problem, known as *HyDE* (Hypothetical Document Embeddings) also involves the use of an LLM to generate content. However, rather than generate additional questions, in this scenario an LLM is prompted to generate a "hypothetical" answer. This answer may contain factual inaccuracies, but should possess the longer content and keywords more representative of an embedded text chunk. The hypothetical answer is then embedded and used for vector similarity search to improve retrieval.
 
 ### 7.3 Golden dataset evaluations
 
-RAG and LLM evaluations is a topic with considerable depth and developing best practices. *Golden datasets* or reference datasets are predefined queries and answers (sometimes including context). Ideally, these are supplied as human-approved content, but can also be gathered from human-approved RAG query responses, or even synthetically generated by an LLM. These datasets are a powerful evaluation tool used when used as a consistent baseline against which all future RAG responses are compared. This tool improves the long-term monitoring of RAG chatbots. Having such a golden dataset as a baseline also allows improved RAG configuration testing since having a consistent dataset on which to compare queries and answers improves comparability of assessments between configurations.
+RAG and LLM evaluations are topics with considerable depth and developing best practices. *Golden datasets* or reference datasets are predefined queries and answers (sometimes including context). Ideally, these are supplied as human-approved content, but can also be gathered from human-approved RAG query responses, or even synthetically generated by an LLM. These datasets are used as a consistent baseline against which all future golden dataset evaluations and RAG responses can be compared. This tool improves the long-term monitoring of RAG chatbots. Having such a golden dataset as a baseline also allows improved RAG configuration testing since having a consistent dataset on which to compare queries and answers improves comparability of assessments between configurations.
 
 [^1]: [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/pdf/2005.11401)
 [^4]: [Vector Embeddings Explained](https://weaviate.io/blog/vector-embeddings-explained)

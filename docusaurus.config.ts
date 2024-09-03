@@ -87,7 +87,7 @@ const config: Config = {
           // activeBasePath: "never-active",
         },
         {
-          href: "https://github.com/paisley-rag/db",
+          href: "https://github.com/paisley-rag/app",
           label: "GitHub",
           position: "right",
         },

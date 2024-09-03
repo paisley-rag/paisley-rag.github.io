@@ -120,7 +120,7 @@ const config: Config = {
             // },
             {
               label: "Github",
-              to: "https://github.com/paisley-rag/db",
+              to: "https://github.com/paisley-rag/app",
             },
           ],
         },

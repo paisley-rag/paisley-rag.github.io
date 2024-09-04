@@ -2,7 +2,7 @@
 title: Case Study
 description: Paisley Case Study
 toc_min_heading_level: 2
-toc_max_heading_level: 4
+toc_max_heading_level: 2
 ---
 
 <!-- <figure className="image-container">
